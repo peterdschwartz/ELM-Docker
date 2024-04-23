@@ -81,7 +81,7 @@ RUN apt-get update -y && \
     && cd / \
     && rm -r expat-$EXPAT_VERSION \
     && rm expat-$EXPAT_VERSION.tar.bz2 \
-    # && apt-get update && apt-get install -y libopenmpi-dev  \
+    && apt-get update && apt-get install -y libopenmpi-dev  \
     && pip3 install wheel numpy scipy netCDF4 h5py configparser pyproj rasterio Dask cftime \
     && CFLAGS=-noswitcherror pip3 install mpi4py \
     && rm -rf /var/lib/apt/lists/* \
@@ -101,7 +101,7 @@ ENV LANG=en_US.UTF-8 \
 RUN locale -a
 
     ## Add Zlib to the path
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ZLIB_DIR/lib 
+ENV LD_LIBRARY_PATH=$ZLIB_DIR/lib:$LD_LIBRARY_PATH
 ENV OMPI_ALLOW_RUN_AS_ROOT=1 
 ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
@@ -123,8 +123,8 @@ RUN cd / \
     && rm -rf build \
     && rm hdf5-$HDF5_VERSION_STRING.tar.gz 
 
-ENV PATH=$PATH:$HDF5_DIR/bin 
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HDF5_DIR/lib
+ENV PATH=$HDF5_DIR/bin:$PATH \
+    LD_LIBRARY_PATH=$HDF5_DIR/lib:$LD_LIBRARY_PATH
 
 ## Install NetCDF-c
 RUN cd / \
@@ -190,4 +190,6 @@ ENV PATH=$NETCDF_DIR/bin:$PATH \
   # Set default user 
   USER=modeluser
 
+# Create symbolic link for bash 
+RUN ln -sf /usr/bin/bash /usr/bin/sh
 
