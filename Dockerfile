@@ -4,7 +4,6 @@ LABEL maintainer.name="Peter Schwartz" \
 # Set a few variables that can be used to control the docker build
 # TODO: actually use these to allow for argument builds OR
 # remove if its not relevant
-# ARG OPENMPI_VERSION=3.1.6
 ARG ZLIB_VERSION=1.3.1
 ARG EXPAT_VERSION=2.4.7 
 ARG HDF5_VERSION_MAJOR=1.14
@@ -63,7 +62,7 @@ RUN apt-get update -y && \
     flex \
     nco \
     locales \
-    ## Compile Zlib
+    # Compile Zlib
     && cd / \
     && wget https://www.zlib.net/zlib-$ZLIB_VERSION.tar.gz \
     && tar -xzf zlib-$ZLIB_VERSION.tar.gz \
@@ -73,7 +72,7 @@ RUN apt-get update -y && \
     && cd / \
     && rm -rf zlib-$ZLIB_VERSION \
     && rm zlib-$ZLIB_VERSION.tar.gz \
-    ## Compile Expat
+    # Compile Expat
     && wget https://github.com/libexpat/libexpat/releases/download/R_2_4_7/expat-$EXPAT_VERSION.tar.bz2 \
     && tar -xvjf expat-$EXPAT_VERSION.tar.bz2 \
     && cd expat-$EXPAT_VERSION \
@@ -107,10 +106,13 @@ ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
 # Try HDF5 install
 # First copy the tarball to the root directory -- faster to wget from host
-COPY hdf5-$HDF5_VERSION_STRING.tar.gz netcdf-c-$NETCDF_C_VERSION.tar.gz netcdf-fortran-$NETCDF_FORTRAN_VERSION.tar.gz /
+COPY hdf5-$HDF5_VERSION_STRING.tar.gz \
+     netcdf-c-$NETCDF_C_VERSION.tar.gz \
+     netcdf-fortran-$NETCDF_FORTRAN_VERSION.tar.gz /
 
 RUN cd / \
     && mkdir -p /usr/local/hdf5 \
+    # && wget https://github.com/HDFGroup/hdf5/releases/download/hdf5_1.14.4.2/hdf5-1.14.4-2.tar.gz \
     && tar -zxvf hdf5-$HDF5_VERSION_STRING.tar.gz \
     && mkdir -p build \
     && cd build \ 
