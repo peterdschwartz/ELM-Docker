@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/nvhpc:23.9-devel-cuda_multi-ubuntu22.04
+FROM nvcr.io/nvidia/nvhpc:25.3-devel-cuda_multi-ubuntu22.04
 LABEL maintainer.name="Peter Schwartz" \
       maintainer.email="schwartzpd@ornl.gov"
 # Set a few variables that can be used to control the docker build
@@ -11,7 +11,7 @@ ARG HDF5_VERSION_STRING=1.14.4-2
 ARG NETCDF_C_VERSION=4.9.2 
 ARG NETCDF_FORTRAN_VERSION=4.6.1 
 ARG NETCDF_CXX_VERSION=4.3.1 
-ARG NV_VERSION=23.9
+ARG NV_VERSION=25.3
 # Set directories 
 ARG ZLIB_DIR=/usr/local/zlib 
 ARG HDF5_DIR=/usr/local/hdf5
@@ -108,7 +108,9 @@ ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 # First copy the tarball to the root directory -- faster to wget from host
 COPY hdf5-$HDF5_VERSION_STRING.tar.gz \
      netcdf-c-$NETCDF_C_VERSION.tar.gz \
-     netcdf-fortran-$NETCDF_FORTRAN_VERSION.tar.gz /
+     netcdf-fortran-$NETCDF_FORTRAN_VERSION.tar.gz 
+     environment.sh \
+     bashmarks.sh /
 
 RUN cd / \
     && mkdir -p /usr/local/hdf5 \
@@ -168,7 +170,6 @@ RUN cd / \
 
 ARG NVARCH=Linux_x86_64
 ARG NVCOMPILERS=/opt/nvidia/hpc_sdk
-#  PATH=$NVCOMPILERS/$NVARCH/24.3/compilers/bin:$PATH; export PATH
 # Add Netcdf to environment 
 ENV PATH=$NETCDF_DIR/bin:$PATH \ 
   LD_LIBRARY_PATH=$NETCDF_DIR/lib:$LD_LIBRARY_PATH \
@@ -193,5 +194,6 @@ ENV PATH=$NETCDF_DIR/bin:$PATH \
   USER=modeluser
 
 # Create symbolic link for bash 
-RUN ln -sf /usr/bin/bash /usr/bin/sh
+RUN ln -sf /usr/bin/bash /usr/bin/sh && \
+    echo 'source /environment.sh && source /bashmarks.sh' >> ~/.bashrc
 
